@@ -54,9 +54,9 @@ class Deploy:
         with open(self.credential_path) as f:
             data = yaml.load(f, Loader=SafeLoader)
             self.host = data['host']
-            logging.debug('host: ', str(self.host))
+            logging.debug(f'host: {self.host}')
             self.username = data['user']
-            logging.debug('user: ', str(self.username))
+            logging.debug(f'user: {self.username}')
             self.password = data['pwd']
             logging.debug('pwd: **************')
         logging.info('extracted login credentials')
@@ -100,7 +100,7 @@ class Deploy:
         if self.kind == 'm':
             self.dest_path = f'{os.path.dirname(self.dest_path)}/main{self.version_number.replace(".", "-")}' \
                              f'{os.path.splitext(os.path.basename(self.src_path))[1]}'
-            logging.debug('destination_path: ',self.dest_path)
+            logging.debug(f'destination_path: {self.dest_path}')
 
     def sftp_connection(self):
         with paramiko.SSHClient() as ssh:
