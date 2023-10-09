@@ -35,23 +35,32 @@ class Deploy:
 
     def __del__(self):
         self.running = False
+        logging.info('DEPLOY finished')
 
     def setup_logger(self):
         if self.debug_level == 'v':
             logging.basicConfig(level=logging.DEBUG, stream=sys.stderr)
+            logging.debug('logging DEBUG')
         else:
             logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+            logging.info('logging INFO')
 
     def prepare_dirs(self):
         if not os.path.exists(self.tmp_path):
             os.makedirs(self.tmp_path)
+            logging.info('made tmp dir')
 
     def import_login_data(self):
         with open(self.credential_path) as f:
             data = yaml.load(f, Loader=SafeLoader)
             self.host = data['host']
+            logging.debug('host: ', self.host)
             self.username = data['user']
+            logging.debug('user: ', self.username)
             self.password = data['pwd']
+            logging.debug('pwd: **************')
+        logging.info('extracted login credentials')
+
 
     def fetch_version_file(self):
         while self.running:
@@ -69,6 +78,7 @@ class Deploy:
                 with open(f'{self.tmp_path}/version.txt.tmp', 'r') as f:
                     for i in f.readlines():
                         self.version_file_data.append(i.replace('\n', ''))
+                logging.info('read remote version.txt')
                 break
 
     def edit_version_file(self):
@@ -82,25 +92,32 @@ class Deploy:
             with open(f'{self.tmp_path}/version.txt', 'w') as f:
                 for i in self.version_file_data:
                     f.write(i+'\n')
+            logging.info('updated data in local version.txt')
 
     def prepare_upload(self):
-        logging.info('Moved src file to tmp dir')
         shutil.copyfile(self.src_path, f'{self.tmp_path}/{os.path.basename(self.src_path)}')
+        logging.info('Moved src file to tmp dir')
 
         if self.kind == 'm':
             self.dest_path = f'{os.path.dirname(self.dest_path)}/main{self.version_number.replace(".", "-")}' \
                              f'{os.path.splitext(os.path.basename(self.src_path))[1]}'
+            logging.debug('destination_path: ',self.dest_path)
 
     def sftp_connection(self):
         with paramiko.SSHClient() as ssh:
             ssh.load_system_host_keys()
+            logging.debug('loaded sys host keys')
             ssh.connect(self.host, username=self.username, password=self.password, port=22)
+            logging.debug(f'established ssh connection to {self.host}:{self.username}:22')
 
             sftp = ssh.open_sftp()
+            logging.debug('establishes sftp connection')
 
             sftp.put(self.src_path, self.dest_path)
+            logging.debug('put src file to dest')
             if self.kind == 'm':
                 sftp.put(f'{self.tmp_path}/version.txt', f'{os.path.dirname(self.dest_path)}/version.txt')
+                logging.debug('put local version to remote version.txt')
 
 
 if __name__ == '__main__':
