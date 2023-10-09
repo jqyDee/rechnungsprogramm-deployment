@@ -35,6 +35,11 @@ class Deploy:
 
     def __del__(self):
         self.running = False
+        files_in_tmp = os.listdir(self.tmp_path)
+        for i in files_in_tmp:
+            os.remove(f'{self.tmp_path}/{i}')
+        if os.path.exists(self.tmp_path):
+            os.remove(self.tmp_path)
         logging.info('DEPLOY finished')
 
     def setup_logger(self):
@@ -137,3 +142,4 @@ if __name__ == '__main__':
     deployer.edit_version_file()
     deployer.prepare_upload()
     deployer.sftp_connection()
+    del deployer
