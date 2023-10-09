@@ -39,7 +39,7 @@ class Deploy:
         for i in files_in_tmp:
             os.remove(f'{self.tmp_path}/{i}')
         if os.path.exists(self.tmp_path):
-            os.remove(self.tmp_path)
+            os.rmdir(self.tmp_path)
         logging.info('DEPLOY finished')
 
     def setup_logger(self):
