@@ -54,13 +54,12 @@ class Deploy:
         with open(self.credential_path) as f:
             data = yaml.load(f, Loader=SafeLoader)
             self.host = data['host']
-            logging.debug('host: ', self.host)
+            logging.debug('host: ', str(self.host))
             self.username = data['user']
-            logging.debug('user: ', self.username)
+            logging.debug('user: ', str(self.username))
             self.password = data['pwd']
             logging.debug('pwd: **************')
         logging.info('extracted login credentials')
-
 
     def fetch_version_file(self):
         while self.running:
