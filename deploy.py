@@ -86,17 +86,21 @@ class Deploy:
                 break
 
     def edit_version_file(self):
-        if self.kind == 'm':
-            if not self.version_number:
-                logging.info('main Deploy needs version number')
-                sys.exit()
+        if not self.version_number:
+            logging.info('main Deploy needs version number')
+            sys.exit()
 
+        if self.kind == 'm':
             self.version_file_data[0] = self.version_number
             self.version_file_data[1] = f'https://ffischh.de/main{self.version_number.replace(".", "-")}.py'
-            with open(f'{self.tmp_path}/version.txt', 'w') as f:
-                for i in self.version_file_data:
-                    f.write(i+'\n')
-            logging.info('updated data in local version.txt')
+        elif self.kind == 'u':
+            self.version_file_data[2] = self.version_number
+            self.version_file_data[3] = f'https://ffischh.de/updater{self.version_number.replace(".", "-")}.py'
+
+        with open(f'{self.tmp_path}/version.txt', 'w') as f:
+            for i in self.version_file_data:
+                f.write(i+'\n')
+        logging.info('updated data in local version.txt')
 
     def prepare_upload(self):
         shutil.copyfile(self.src_path, f'{self.tmp_path}/{os.path.basename(self.src_path)}')
@@ -105,7 +109,11 @@ class Deploy:
         if self.kind == 'm':
             self.dest_path = f'{os.path.dirname(self.dest_path)}/main{self.version_number.replace(".", "-")}' \
                              f'{os.path.splitext(os.path.basename(self.src_path))[1]}'
-            logging.debug(f'destination_path: {self.dest_path}')
+        if self.kind == 'u':
+            self.dest_path = f'{os.path.dirname(self.dest_path)}/updater{self.version_number.replace(".", "-")}' \
+                             f'{os.path.splitext(os.path.basename(self.src_path))[1]}'
+
+        logging.debug(f'destination_path: {self.dest_path}')
 
     def sftp_connection(self):
         with paramiko.SSHClient() as ssh:
@@ -119,9 +127,8 @@ class Deploy:
 
             sftp.put(self.src_path, self.dest_path)
             logging.debug('put src file to dest')
-            if self.kind == 'm':
+            if self.kind in ('m', 'u'):
                 sftp.put(f'{self.tmp_path}/version.txt', f'{os.path.dirname(self.dest_path)}/version.txt')
-                logging.debug('put local version to remote version.txt')
 
 
 if __name__ == '__main__':
