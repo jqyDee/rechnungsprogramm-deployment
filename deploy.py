@@ -90,12 +90,16 @@ class Deploy:
             logging.info('main Deploy needs version number')
             sys.exit()
 
+        logging.debug(f'old version file data: {self.version_file_data}')
+
         if self.kind == 'm':
             self.version_file_data[0] = self.version_number
             self.version_file_data[1] = f'https://ffischh.de/main{self.version_number.replace(".", "-")}.py'
         elif self.kind == 'u':
             self.version_file_data[2] = self.version_number
             self.version_file_data[3] = f'https://ffischh.de/updater{self.version_number.replace(".", "-")}.py'
+
+        logging.debug(f'new version file data: {self.version_file_data}')
 
         with open(f'{self.tmp_path}/version.txt', 'w') as f:
             for i in self.version_file_data:
@@ -127,6 +131,7 @@ class Deploy:
 
             sftp.put(self.src_path, self.dest_path)
             logging.debug('put src file to dest')
+
             if self.kind in ('m', 'u'):
                 sftp.put(f'{self.tmp_path}/version.txt', f'{os.path.dirname(self.dest_path)}/version.txt')
 
