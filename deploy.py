@@ -70,7 +70,7 @@ class Deploy:
         while self.running:
             try:
                 logging.info('Requesting version.txt')
-                urllib.request.urlretrieve('https://ffischh.de/version.txt', f'{self.tmp_path}/version.txt.tmp')
+                urllib.request.urlretrieve('https://rechnungsprogramm.ffischh.de/version.txt', f'{self.tmp_path}/version.txt.tmp')
             except HTTPError as e:
                 logging.error('Error code: ', e.code)
                 time.sleep(self.sleep_time)
@@ -94,10 +94,10 @@ class Deploy:
 
         if self.kind == 'm':
             self.version_file_data[0] = self.version_number
-            self.version_file_data[1] = f'https://ffischh.de/main{self.version_number.replace(".", "-")}.py'
+            self.version_file_data[1] = f'https://rechnungsprogramm.ffischh.de/main{self.version_number.replace(".", "-")}.py'
         elif self.kind == 'u':
             self.version_file_data[2] = self.version_number
-            self.version_file_data[3] = f'https://ffischh.de/updater{self.version_number.replace(".", "-")}.py'
+            self.version_file_data[3] = f'https://rechnungsprogramm.ffischh.de/updater{self.version_number.replace(".", "-")}.py'
 
         logging.debug(f'new version file data: {self.version_file_data}')
 
