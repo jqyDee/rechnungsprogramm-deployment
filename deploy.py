@@ -35,12 +35,15 @@ class Deploy:
 
     def __del__(self):
         self.running = False
-        files_in_tmp = os.listdir(self.tmp_path)
+        try:
+            files_in_tmp = os.listdir(self.tmp_path)
+        except FileNotFoundError:
+            return logging.info('DEPLOY finished')
         for i in files_in_tmp:
             os.remove(f'{self.tmp_path}/{i}')
         if os.path.exists(self.tmp_path):
             os.rmdir(self.tmp_path)
-        logging.info('DEPLOY finished')
+        return logging.info('DEPLOY finished')
 
     def setup_logger(self):
         if self.debug_level == 'v':
@@ -119,7 +122,7 @@ class Deploy:
 
         logging.debug(f'destination_path: {self.dest_path}')
 
-    def sftp_connection(self):
+    def sftp_connection(self) -> bool:
         with paramiko.SSHClient() as ssh:
             ssh.load_system_host_keys()
             logging.debug('loaded sys host keys')
@@ -134,6 +137,11 @@ class Deploy:
 
             if self.kind in ('m', 'u'):
                 sftp.put(f'{self.tmp_path}/version.txt', f'{os.path.dirname(self.dest_path)}/version.txt')
+            return True
+
+    def create_gh_release(self):
+        os.system(f'cd {os.path.dirname(self.src_path)}')
+        os.system(f'gh release create v{self.version_number} --generate-notes --latest -t v{self.version_number}')
 
 
 if __name__ == '__main__':
@@ -153,5 +161,6 @@ if __name__ == '__main__':
     deployer.fetch_version_file()
     deployer.edit_version_file()
     deployer.prepare_upload()
-    deployer.sftp_connection()
+    if deployer.sftp_connection():
+        deployer.create_gh_release()
     del deployer
