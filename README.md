@@ -8,7 +8,7 @@ Python3 and gh is needed to run script (to install gh through brew run ```brew i
 ## Command
 
 ```
-python <kind> <path-to-deploy.py> <path-to-src-file> <dest-path-in-sftp-server> <version-number> <v>
+python <path-to-deploy.py> <kind> <path-to-src-file> <dest-path-in-sftp-server> <version-number> <v>
 ```
 
 ```kind``` can be either ```m``` or ```u```
