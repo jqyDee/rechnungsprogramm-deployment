@@ -15,6 +15,9 @@ python <kind> <path-to-deploy.py> <path-to-src-file> <dest-path-in-sftp-server> 
 
 ```v``` makes the output verbose and is optional
 
+### Command help Rechnungsprogramm (user specific)
+```python /Users/mfischbach/Developer/python/rechnungsprogramm-deployment/deploy.py m /Users/mfischbach/Developer/python/rechnungsprogramm/main.py / 3.7.13```
+
 ## Footer
 
 Copyright: 2023 Matti Fischbach
